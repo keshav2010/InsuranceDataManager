@@ -116,7 +116,7 @@ class FrameEventManager implements ActionListener {
 		}
 		
 		else if(item.getText().equals(MainFrame.stringMenuAddRecord)) {
-			AddRecordDialog g = new AddRecordDialog();
+			AddRecordDialog g = new AddRecordDialog("fileName");//TODO: file name passed as argument
 		}
 	}
 }
