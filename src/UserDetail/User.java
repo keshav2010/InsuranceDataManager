@@ -18,10 +18,11 @@ public class User implements Serializable, Comparable<User> {
 	public double primium;
 	public String nextDue; //month names , trhis should be array or suitable 
 	public String address;
+	
+	
 	@Override
 	public int compareTo(User other) {
-		
-		return 0;
+		return 0;//same
 	}
 	
 };

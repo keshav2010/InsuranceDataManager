@@ -32,14 +32,31 @@ import Misc.CustomDate;
 //The dialog contains multiple fields for user to enter record's information and save it to file.
 public class AddRecordDialog extends JDialog{
 	
+	//indices of labels in String[] labels array
+	public static final int NAME=0, POLICY_NO=1, PHONE_NO=2,
+			DOB=3, DOC=4, SUM_ASSURED=5,
+			PLAN_AND_TERM=6, MODE=7, PRIMIUM=8, NEXT_DUE=9;
+	public static final String[] labels = {"NAME", "POLICY NO.", "PHONE NO.",
+			"D.O.B", "D.O.C", "SUM ASSURED", "PLAN AND TERM",
+			"MODE", "PRIMIUM", "NEXT DUE"};
+	
+
+	public JButton submitButton;
+	public JTextField textField_Name, textField_PolicyNo, textField_PhoneNo,
+		textField_SumAssured, textField_PlanAndTerm, textField_Mode, 
+		textField_Primium, textField_NextDue;
+	public CustomDateField dateField_DOB, dateField_DOC;
+	public JComboBox comboBox_Mode;
+	
 	public String activeFile;
-	private JLabel fileName;//current active file in which data will be appended
-	private JLabel fileRecordCount;// number of records that exists in file 
+	private JLabel label_fileName;//current active file in which data will be appended
+	private JLabel label_fileRecordCount;// number of records that exists in file 
 	private GridBagConstraints dialogLayoutHandler = new GridBagConstraints();
 	
-	private DialogEventManager dialogEventManager;
 	
+	private DialogEventManager dialogEventManager;
 	public AddRecordDialog(String _fileName) {
+		dialogEventManager = new DialogEventManager(this);	
 		activeFile = new String(_fileName);
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		this.setTitle("Add New Record");
@@ -65,26 +82,21 @@ public class AddRecordDialog extends JDialog{
 	//helper function that sets up the form structure where user can fill record data to be added
 	private void setupForm() {
 		//initializing Labels that displays fileName and Number of Records in file
-		fileName = new JLabel("Data will be stored in file : "+ activeFile);
+		label_fileName = new JLabel("Data will be stored in file : "+ activeFile);
 		int fileRecordsCount=0;
-		try {
-			FileInputStream fin = new FileInputStream(activeFile);
-			//TODO : code for counting records from file required
-		} catch (FileNotFoundException e) {
-			//do nothing
-		}
-		fileRecordCount = new JLabel("Number of Records in current File : " + String.valueOf(fileRecordsCount));
+		label_fileRecordCount = new JLabel("Number of Records in current File : " + String.valueOf(fileRecordsCount));
 		//
 		
-		JButton submitButton = new JButton("Add");
+		submitButton = new JButton("Add");
+		submitButton.addActionListener(dialogEventManager);
 		
-		String[] labels = {"Name", "Policy No.", "Phone No.",
-				"D.O.B", "D.O.C", "Sum Assured", "Plan And Term",
-				"Mode", "Primium", "Next Due"};
 		
 		for(int i=0; i<labels.length; i++) {
 			if(labels[i].equals("D.O.B") || labels[i].equals("D.O.C")) {
 				addDateField(labels[i], i);
+			}
+			else if(labels[i].equals("MODE")) {
+				addModeComboBox(labels[i], i);
 			}
 			else addTextField(labels[i], i);
 		}		
@@ -97,21 +109,59 @@ public class AddRecordDialog extends JDialog{
 		
 		updateLayoutHandler(0, labels.length+1, GridBagConstraints.HORIZONTAL, 0, 0);
 		dialogLayoutHandler.insets.left = dialogLayoutHandler.insets.right = 15;
-		this.add(fileName, dialogLayoutHandler);
+		this.add(label_fileName, dialogLayoutHandler);
 		dialogLayoutHandler.gridx++;
-		this.add(fileRecordCount, dialogLayoutHandler);
+		this.add(label_fileRecordCount, dialogLayoutHandler);
+
+	}
+	//adds a comboBox for MODE field
+	private void addModeComboBox(String labelName, int rowNumber) {
+		JLabel textLabel = new JLabel(labelName);
+		String[] modes = {"MTLY", "H/YRLY", "QRTLY", "YRLY"};
+		JComboBox<String> comboBox = new JComboBox<String>(modes);
 		
+		updateLayoutHandler(0, rowNumber, GridBagConstraints.HORIZONTAL, 0, 0);
+		dialogLayoutHandler.insets.left = dialogLayoutHandler.insets.right = 15;
+		this.add(textLabel, dialogLayoutHandler);
+		
+		dialogLayoutHandler.gridx = 1;
+		this.add(comboBox, dialogLayoutHandler);
 	}
 	//helper function : adds a JLabel with "labelName" label and a JTextField on its right on specified rowNumber
 	private void addTextField(String labelName, int rowNumber) {
 		JLabel textLabel = new JLabel(labelName);
+		JTextField textData = new JTextField();
+
+		if(labelName.equals( labels[NAME] )) {
+			textField_Name = textData;
+		}
+		else if(labelName.equals( labels[POLICY_NO] )) {
+			textField_PolicyNo = textData;
+		}
+		else if(labelName.equals( labels[PHONE_NO])) {
+			textField_PhoneNo = textData;
+		}
+		else if(labelName.equals( labels[SUM_ASSURED])) {
+			textField_SumAssured = textData;
+		}
+		else if(labelName.equals( labels[PLAN_AND_TERM])) {
+			textField_PlanAndTerm = textData;
+		}
+		else if(labelName.equals( labels[PRIMIUM])) {
+			textField_Primium = textData;
+		}
+		else if(labelName.equals( labels[NEXT_DUE] )) {
+			textField_NextDue = textData;
+		}
+		
 		updateLayoutHandler(0, rowNumber, GridBagConstraints.HORIZONTAL, 1, 1);
 		dialogLayoutHandler.insets.left = 15; //some custom changes
 		this.add(textLabel, dialogLayoutHandler);
-		JTextField textData = new JTextField();
+
 		textData.setEditable(true);
-		
-		updateLayoutHandler(1, rowNumber, GridBagConstraints.HORIZONTAL,1, 1);
+		textData.setName(labelName);
+
+		dialogLayoutHandler.gridx=1;
 		dialogLayoutHandler.insets.right = 15; //custom changes
 		
 		this.add(textData, dialogLayoutHandler);
@@ -120,28 +170,28 @@ public class AddRecordDialog extends JDialog{
 	//helper function : adds a custom dateField
 	private void addDateField(String labelName, int rowNumber) {
 		JLabel textLabel = new JLabel(labelName);
-		updateLayoutHandler(0, rowNumber, GridBagConstraints.HORIZONTAL, 1, 1);
+		updateLayoutHandler(0, rowNumber, GridBagConstraints.HORIZONTAL, 0, 0);
 		dialogLayoutHandler.insets.left= 15;
 		this.add(textLabel, dialogLayoutHandler);
 		
 		CustomDateField dateField = new CustomDateField();
+		dateField.setName(labelName);
 		
-		updateLayoutHandler(0, rowNumber, GridBagConstraints.HORIZONTAL, 1, 1);
+		dialogLayoutHandler.gridx=1;
 		dialogLayoutHandler.insets.right= 15;
-		dialogLayoutHandler.gridwidth=3;
 		this.add(dateField, dialogLayoutHandler);
 	}
 	
 }
 
 //helper class, sets up a basic date field 
-class CustomDateField  extends JComponent implements SwingConstants
+class CustomDateField  extends JComponent
 {
 	private CustomDate date;
 	private JComboBox<String> monthBox;
 	private JTextField dateField;
 	private JTextField yearField;
-	FlowLayout layout = new FlowLayout();
+	GridLayout layout = new GridLayout();
 	public CustomDateField() {
 		
 		monthBox = new JComboBox<String>(CustomDate.getMonths());
@@ -151,8 +201,7 @@ class CustomDateField  extends JComponent implements SwingConstants
 		dateField = new JTextField("01");
 		yearField = new JTextField("2018");
 				
-		layout.setHgap(2);
-		layout.setAlignment(FlowLayout.TRAILING);
+		layout.setHgap(10);
 		this.setLayout(layout);
 		
 		this.add(dateField);
@@ -170,11 +219,17 @@ class CustomDateField  extends JComponent implements SwingConstants
 
 // management of events is handled by this class
 class DialogEventManager implements ActionListener{
-
+	private AddRecordDialog dialog;
+	
+	public DialogEventManager(AddRecordDialog dialog) {
+		this.dialog=dialog;
+	}
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
+	public void actionPerformed(ActionEvent e) {
 		
 	}
-	
-}
+	private boolean isFormValid() {
+		
+		return true;
+	}
+};
