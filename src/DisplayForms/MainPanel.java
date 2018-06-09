@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.IOException;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -21,13 +22,22 @@ public class MainPanel extends JPanel {
 	public SheetTable sheetTable;
 	private JScrollPane scrollPane;
 	
+	public String activeFileName=null;
+	public JLabel label_fileName;
+	
 	//setup panel's layout, adds scrollpane and associated table
 	public MainPanel() {
 		
 		this.setLayout(new GridBagLayout());
 		sheetTable = new SheetTable();
 		scrollPane = new JScrollPane(sheetTable);
-		updateLayoutHandler(0,0, GridBagConstraints.BOTH, 1, 1); //update layoutHandler
+		
+		updateLayoutHandler(0,0, GridBagConstraints.HORIZONTAL, 0, 0);
+		label_fileName = new JLabel("No active file found, create a new file (File > New) or open existing files. (File > Open)");
+		label_fileName.setForeground(Color.red);
+		this.add(label_fileName, layoutHandler);
+		
+		updateLayoutHandler(0,1, GridBagConstraints.BOTH, 1, 1); //update layoutHandler
 		this.add(scrollPane, layoutHandler); //add scrollPane that includes Table in it
 		this.setVisible(true);
 	}
