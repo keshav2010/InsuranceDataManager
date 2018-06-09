@@ -15,6 +15,8 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import Misc.FileManager;
+
 public class FileMakerDialog extends JDialog{
 	public static final String[] labels = {"FILE NAME"};
 	public HashMap<String, JTextField> textFields;
@@ -79,34 +81,34 @@ public class FileMakerDialog extends JDialog{
 }
 class EventManager implements ActionListener
 {
-	private FileMakerDialog dialog;
+	private FileMakerDialog fileMakerDialog;
 	public EventManager(FileMakerDialog d)
 	{
-		dialog = d;
+		fileMakerDialog = d;
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getSource().equals(dialog.btn_createFile))
+		if(e.getSource().equals(fileMakerDialog.btn_createFile))
 		{
-			String text=dialog.textFields.get(FileMakerDialog.labels[0]).getText().trim();
+			String text=fileMakerDialog.textFields.get(FileMakerDialog.labels[0]).getText().trim();
 			if(text.length()==0)
 				return;
 			File f = new File(text);
-			dialog.mainFrame.activeFileName = new String(text);
-			dialog.mainFrame.mainPanel.label_fileName.setText("Current Active File : "+text);
-			dialog.mainFrame.mainPanel.label_fileName.setForeground(Color.BLACK);
+			
 			if(!f.exists()) {
 				try {
 					f.createNewFile();
 					System.out.println("Created file "+f.getAbsolutePath());
-					
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
+			FileManager.setActiveFileName(new String(text));
+			fileMakerDialog.mainFrame.mainPanel.label_fileName.setForeground(Color.black);
+			fileMakerDialog.mainFrame.mainPanel.label_fileName.setText("Current Active File : "+FileManager.getActiveFileName());
 		}
-		dialog.dispose();
+		fileMakerDialog.dispose();
 	}
 	
 }

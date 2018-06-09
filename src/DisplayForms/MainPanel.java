@@ -22,7 +22,6 @@ public class MainPanel extends JPanel {
 	public SheetTable sheetTable;
 	private JScrollPane scrollPane;
 	
-	public String activeFileName=null;
 	public JLabel label_fileName;
 	
 	//setup panel's layout, adds scrollpane and associated table
@@ -64,8 +63,6 @@ class SheetTable extends JTable{
 }//end of class SheetTable
 
 class TableModel extends AbstractTableModel{
-	public String activeFileName=null;
-	FileManager fileManager;
 	private static final long serialVersionUID = 1L;
 	private static final String[] columnNames = 
 		{
@@ -80,28 +77,15 @@ class TableModel extends AbstractTableModel{
 				"PRIMIUM",
 				"NEXT DUE"
 		};
-	public TableModel() {
-		activeFileName = null;
-	}
-	public TableModel(String _fileName) {
-		activeFileName = new String(_fileName);
-		try {
-			fileManager = new FileManager(activeFileName);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			System.out.println("TableModel : issue with init. fileManager");
-			System.exit(1);
-		}
-	}
 	@Override
 	public int getColumnCount() {
 		return columnNames.length;
 	}
 	@Override
 	public int getRowCount() {
-		if(activeFileName == null)
+		if(FileManager.getActiveFileName() == null)
 			return 0;
-		return fileManager.getActiveFileRecordsCount();
+		return FileManager.getActiveFileRecordsCount();
 	}
 	@Override
 	public Object getValueAt(int row, int col) {

@@ -11,96 +11,89 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import UserDetail.User;
-//instance of FileManager is responsible for handling read/write operation of single file
-//multiple instances should be made for multiple files.
-public class FileManager {
-	private String activeFileName=null;
-	private int fileRecordsCount=0;
+//FileManager is responsible for handling read/write operation of a file
+public class FileManager 
+{
+	private static String activeFileName=null;
+	private static int fileRecordsCount=0;
 	
-	private FileInputStream fin;
-	private FileOutputStream fout;
+	private static ObjectOutputStream ous;
+	private static ObjectInputStream ois;
 	
-	private ObjectOutputStream ous;
-	private ObjectInputStream ois;
-	
-	private File file;
+	private static File file;
 	
 	//data is stored in file as key-value pair, key is Policy Number and value is user-data
-	private TreeMap<String, User> fileTreeMap=null; 
+	private static TreeMap<String, User> fileTreeMap=null; 
 	
 	/*
 	 * current implementation is not fit for large amount of data
 	 * reads in entire file content, updates it in-memory 
 	 * and writes back entire content back to file.
 	*/
-	public FileManager(String fileName) throws IOException {
-		System.out.println("FileManager init. for file : "+activeFileName);
-		file = new File(fileName);
-		if(!file.exists())
-			file.createNewFile();
-		
-		//initialize streams
-		fin = new FileInputStream(file);
-		fout = new FileOutputStream(file);
-		
-		ois = new ObjectInputStream(fin);
-		ous = new ObjectOutputStream(fout);
-		
-		//load fileTreeMap with the latest file content
-		try {
-			fileTreeMap = new TreeMap<String, User>((TreeMap<String, User>) ois.readObject());
-			fileRecordsCount = fileTreeMap.size();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			System.out.println("failed to update fileTreeMap in FileManager.java, constructor");
-		}
-		
-	}
-	
-	@Override
-	protected void finalize() {
-		System.out.println("finalizing FileManager instance for file : " + activeFileName);
-		try {
-			ois.close();
-			
-			ous.writeObject(fileTreeMap);
-			ous.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public String getActiveFileName() {
+	public static String getActiveFileName() {
 		return activeFileName;
 	}
-	public int getActiveFileRecordsCount() {
-		fileRecordsCount = fileTreeMap.size();
+	public static void setActiveFileName(String filename) {
+		activeFileName = new String(filename);
+		file = new File(activeFileName);
+		if(!file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.out.println("FileManager > setActiveFileName > error creating file");
+				e.printStackTrace();
+			}
+		}
+		else System.out.println("File already found");
+		try {
+			ois = new ObjectInputStream(new FileInputStream(file));
+			fileTreeMap = new TreeMap<String, User> ( (TreeMap<String, User>) ois.readObject());
+			ois.close();
+			fileRecordsCount = fileTreeMap.size();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Empty File");
+			fileTreeMap = new TreeMap<String, User>();
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			System.out.println("CLASSNOTFOUND");
+			e.printStackTrace();
+		}
+		
+	}
+	public static int getActiveFileRecordsCount() {
 		return fileRecordsCount;
 	}
-	public User getRecord(String policyNumber) {
+	public static User getRecord(String policyNumber) {
 		return fileTreeMap.get(policyNumber);
 	}
-	public boolean isRecordExist(User record) {
+	public static boolean isRecordExist(User record) {
 		String policyNumber = new String(record.policyNumber);
+		if(fileTreeMap == null)
+			return false;
 		return fileTreeMap.containsKey(policyNumber);
 	}
 	
-	public void addRecord(User record) {
-		if(isRecordExist(record))
+	public static void addRecord(User record) throws FileNotFoundException, IOException {
+		if(isRecordExist(record)) {
+			System.out.println("record already exist");
 			return;
+		}
+		ous = new ObjectOutputStream(new FileOutputStream(file));
 		fileTreeMap.put(record.policyNumber, record);
-		//ous.writeObject(fileTreeMap);
+		ous.writeObject(fileTreeMap);
+		ous.close();
 		fileRecordsCount++;
 	}
-	public void deleteRecord(User record) {
+	public static void deleteRecord(User record) throws FileNotFoundException, IOException {
 		if(!isRecordExist(record))
 			return;
 		fileTreeMap.remove(record.policyNumber);
-		//ous.writeObject(fileTreeMap);
-		fileRecordsCount--;
-	}
-	public void updateFileContent() throws IOException {
+		ous = new ObjectOutputStream(new FileOutputStream(file));
 		ous.writeObject(fileTreeMap);
+		ous.close();
+		fileRecordsCount--;
 	}
 }

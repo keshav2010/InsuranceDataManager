@@ -1,7 +1,8 @@
 package Misc;
 
+import java.io.Serializable;
 
-public class CustomDate{
+public class CustomDate implements Serializable{
 	
 	//acc. for months declared here for mantaining uniformity in application
 	public static String stringJanuary = new String("JAN");

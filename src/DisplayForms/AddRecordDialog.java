@@ -50,17 +50,16 @@ public class AddRecordDialog extends JDialog{
 	public JButton submitButton;
 	public CustomDateField dateField_DOB, dateField_DOC;
 	public JComboBox comboBox_Mode;
-
-	public String activeFileName;
+	
 	private JLabel label_fileName;//current active file in which data will be appended
 	private JLabel label_fileRecordCount;// number of records that exists in file 
 	private GridBagConstraints dialogLayoutHandler = new GridBagConstraints();
 	
 	
 	private DialogEventManager dialogEventManager;
-	public AddRecordDialog(String _fileName) {
-		dialogEventManager = new DialogEventManager(this);	
-		activeFileName = new String(_fileName);
+	public AddRecordDialog() {
+		dialogEventManager = new DialogEventManager(this);
+		
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		this.setTitle("Add New Record");
 		this.setLayout(new GridBagLayout());
@@ -140,16 +139,24 @@ public class AddRecordDialog extends JDialog{
 		dialogLayoutHandler.insets = new Insets(0,0,0,0);
 	}
 	//sets up the form structure where user can fill record data to be added
+	
+	public void updateVisibleInfo() {
+		if(label_fileName == null)
+			label_fileName = new JLabel();
+		if(FileManager.getActiveFileName() == null)
+			label_fileName = new JLabel("Data won't be saved, no active file");
+		else label_fileName = new JLabel("Data will be stored in file : " + FileManager.getActiveFileName());
+		
+		if(label_fileRecordCount==null)
+			label_fileRecordCount = new JLabel();
+		label_fileRecordCount.setText("Number of Records in current File : " + String.valueOf(FileManager.getActiveFileRecordsCount()));
+	}
 	private void setupForm() {
 		//initializing Labels that displays fileName and Number of Records in file
-		label_fileName = new JLabel("Data will be stored in file : "+ activeFileName);
-		int fileRecordsCount=0;
-		label_fileRecordCount = new JLabel("Number of Records in current File : " + String.valueOf(fileRecordsCount));
-		//
+		updateVisibleInfo();
 		textFields = new HashMap<String, JTextField>();
 		submitButton = new JButton("Add");
 		submitButton.addActionListener(dialogEventManager);
-		
 		
 		for(int i=0; i<labels.length; i++) {
 			
@@ -264,33 +271,29 @@ class CustomDateField  extends JComponent
 
 // management of events is handled by this class
 class DialogEventManager implements ActionListener{
-	private AddRecordDialog dialog;
+	private AddRecordDialog addRecordDialog;
 	
 	public DialogEventManager(AddRecordDialog dialog) {
-		this.dialog=dialog;
+		this.addRecordDialog=dialog;
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		FileManager fileManager = null;
-		try {
-			fileManager = new FileManager(dialog.activeFileName);
-		} catch (IOException e2) {
-			System.out.println("Unable to add record to file, operation failed");
-			System.exit(1);
-		}
+		
 		//addNewRecord Button
-		if(e.getSource().equals(dialog.submitButton)) {
+		if(e.getSource().equals(addRecordDialog.submitButton)) {
 			System.out.println("Submit Pressed");
-			if(dialog.isFormValid()){
+			if(addRecordDialog.isFormValid()){
 				System.out.println("Form Valid");
-				//construct Student object and store it in file
-				fileManager.addRecord(dialog.getNewUser());
+				//construct object and store it in file
 				try {
-					fileManager.updateFileContent();
+					System.out.println("adding record");
+					FileManager.addRecord(addRecordDialog.getNewUser());
+					addRecordDialog.updateVisibleInfo();
+					
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					System.out.println("Failed to write latest content back to file, AddRecord operation crash");
-					System.exit(1);
+					System.out.println("Failed to add Record to file , exption raised in DialogEventManager");
+					e1.printStackTrace();
+					
 				}
 			}
 			else System.out.println("invalid form");
