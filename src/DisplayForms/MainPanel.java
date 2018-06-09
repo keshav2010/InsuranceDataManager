@@ -3,6 +3,7 @@ package DisplayForms;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.io.IOException;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -10,10 +11,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
+
+import Misc.FileManager;
 //sets up the panel that includes a SrollPane along with a JTable object, 
 //MainPanel will also include several additional components such as checkboxes etc
 public class MainPanel extends JPanel {
-	
+
 	public GridBagConstraints layoutHandler = new GridBagConstraints();
 	public SheetTable sheetTable;
 	private JScrollPane scrollPane;
@@ -51,7 +54,8 @@ class SheetTable extends JTable{
 }//end of class SheetTable
 
 class TableModel extends AbstractTableModel{
-
+	public String activeFileName=null;
+	FileManager fileManager;
 	private static final long serialVersionUID = 1L;
 	private static final String[] columnNames = 
 		{
@@ -66,17 +70,31 @@ class TableModel extends AbstractTableModel{
 				"PRIMIUM",
 				"NEXT DUE"
 		};
+	public TableModel() {
+		activeFileName = null;
+	}
+	public TableModel(String _fileName) {
+		activeFileName = new String(_fileName);
+		try {
+			fileManager = new FileManager(activeFileName);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("TableModel : issue with init. fileManager");
+			System.exit(1);
+		}
+	}
 	@Override
 	public int getColumnCount() {
 		return columnNames.length;
 	}
 	@Override
 	public int getRowCount() {
-		return 2;
+		if(activeFileName == null)
+			return 0;
+		return fileManager.getActiveFileRecordsCount();
 	}
 	@Override
 	public Object getValueAt(int row, int col) {
-		
 		return null;
 	}
 	@Override //set up column header names

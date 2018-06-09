@@ -15,6 +15,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
@@ -28,6 +32,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import Misc.CustomDate;
+import Misc.FileManager;
+import UserDetail.User;
 //Add Record Dialog class, this dialog is poped up when user decides to add a new record to a file, 
 //The dialog contains multiple fields for user to enter record's information and save it to file.
 public class AddRecordDialog extends JDialog{
@@ -35,20 +41,17 @@ public class AddRecordDialog extends JDialog{
 	//indices of labels in String[] labels array
 	public static final int NAME=0, POLICY_NO=1, PHONE_NO=2,
 			DOB=3, DOC=4, SUM_ASSURED=5,
-			PLAN_AND_TERM=6, MODE=7, PRIMIUM=8, NEXT_DUE=9;
+			PLAN_AND_TERM=6, MODE=7, PRIMIUM=8, NEXT_DUE=9, ADDRESS = 10;
 	public static final String[] labels = {"NAME", "POLICY NO.", "PHONE NO.",
 			"D.O.B", "D.O.C", "SUM ASSURED", "PLAN AND TERM",
-			"MODE", "PRIMIUM", "NEXT DUE"};
+			"MODE", "PRIMIUM", "NEXT DUE", "ADDRESS"};
 	
-
+	public HashMap<String, JTextField> textFields; 
 	public JButton submitButton;
-	public JTextField textField_Name, textField_PolicyNo, textField_PhoneNo,
-		textField_SumAssured, textField_PlanAndTerm, textField_Mode, 
-		textField_Primium, textField_NextDue;
 	public CustomDateField dateField_DOB, dateField_DOC;
 	public JComboBox comboBox_Mode;
-	
-	public String activeFile;
+
+	public String activeFileName;
 	private JLabel label_fileName;//current active file in which data will be appended
 	private JLabel label_fileRecordCount;// number of records that exists in file 
 	private GridBagConstraints dialogLayoutHandler = new GridBagConstraints();
@@ -57,7 +60,7 @@ public class AddRecordDialog extends JDialog{
 	private DialogEventManager dialogEventManager;
 	public AddRecordDialog(String _fileName) {
 		dialogEventManager = new DialogEventManager(this);	
-		activeFile = new String(_fileName);
+		activeFileName = new String(_fileName);
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		this.setTitle("Add New Record");
 		this.setLayout(new GridBagLayout());
@@ -66,6 +69,63 @@ public class AddRecordDialog extends JDialog{
 		this.getContentPane().setBackground(Color.gray.brighter());
 		this.setVisible(true);
 	}
+	
+	
+	public User getNewUser() {
+		User userRecord = new User();
+		for(int i=0; i<AddRecordDialog.labels.length; i++)
+		{
+			String labelText = new String(AddRecordDialog.labels[i]);
+			switch(labelText.toUpperCase()) {
+				case "NAME": userRecord.name = new String(textFields.get("NAME").getText().trim().toUpperCase());
+				break;
+				case "POLICY NO.": userRecord.policyNumber = new String(textFields.get("POLICY NO.").getText().trim());
+				break;
+				case "PHONE NO.": userRecord.mobileNumber = new String(textFields.get("PHONE NO.").getText().trim());
+				break;
+				case "D.O.B": userRecord.dateOfBirth = new CustomDate(dateField_DOB.getDate());
+				break;
+				case "D.O.C": userRecord.doc = new CustomDate(dateField_DOC.getDate());
+				break;
+				case "SUM ASSURED": userRecord.sum = Double.parseDouble(textFields.get("SUM ASSURED").getText());
+				break;
+				case "PLAN AND TERM": userRecord.planAndTerm = new String(textFields.get("PLAN AND TERM").getText().trim());
+				break;
+				case "MODE": userRecord.mode = new String(comboBox_Mode.getModel().getSelectedItem().toString());
+				break;
+				case "PRIMIUM": userRecord.primium = Double.parseDouble(textFields.get("PRIMIUM").getText());
+				break;
+				case "NEXT DUE": userRecord.nextDue = new String(textFields.get("NEXT DUE").getText());
+				break;
+				case "ADDRESS" : userRecord.address = new String(textFields.get("ADDRESS").getText().trim());
+				break;
+				default: return null;
+			}
+			
+		}
+		System.out.println(userRecord);
+		return userRecord;
+	}
+	
+	//tests for empty fields only
+	public boolean isFormValid() {
+		for(int i=0; i<AddRecordDialog.labels.length; i++) {
+			if(AddRecordDialog.labels[i].equals("D.O.B")) {
+				continue;
+			}
+			else if(AddRecordDialog.labels[i].equals("D.O.C")) {
+				continue;
+			}
+			else if(AddRecordDialog.labels[i].equals("MODE")) {
+				continue;
+			}
+			JTextField temp = this.textFields.get(AddRecordDialog.labels[i]);
+			if(temp.getText().trim().length()==0)
+				return false;
+		}
+		return true;
+	}
+	
 	//helper function
 	private void updateLayoutHandler(int gridX, int gridY, int fill, double weightX, double weightY) {
 		dialogLayoutHandler.gridx = gridX;
@@ -79,26 +139,28 @@ public class AddRecordDialog extends JDialog{
 		dialogLayoutHandler.gridwidth=1;
 		dialogLayoutHandler.insets = new Insets(0,0,0,0);
 	}
-	//helper function that sets up the form structure where user can fill record data to be added
+	//sets up the form structure where user can fill record data to be added
 	private void setupForm() {
 		//initializing Labels that displays fileName and Number of Records in file
-		label_fileName = new JLabel("Data will be stored in file : "+ activeFile);
+		label_fileName = new JLabel("Data will be stored in file : "+ activeFileName);
 		int fileRecordsCount=0;
 		label_fileRecordCount = new JLabel("Number of Records in current File : " + String.valueOf(fileRecordsCount));
 		//
-		
+		textFields = new HashMap<String, JTextField>();
 		submitButton = new JButton("Add");
 		submitButton.addActionListener(dialogEventManager);
 		
 		
 		for(int i=0; i<labels.length; i++) {
-			if(labels[i].equals("D.O.B") || labels[i].equals("D.O.C")) {
-				addDateField(labels[i], i);
-			}
-			else if(labels[i].equals("MODE")) {
-				addModeComboBox(labels[i], i);
-			}
-			else addTextField(labels[i], i);
+			
+			if(labels[i].equals("D.O.B"))
+				dateField_DOB = addDateField(labels[i], i);
+			else if(labels[i].equals("D.O.C"))
+				dateField_DOC = addDateField(labels[i], i);
+			else if(labels[i].equals("MODE"))
+				comboBox_Mode = addModeComboBox(labels[i], i);
+			else textFields.putIfAbsent(labels[i], addTextField(labels[i],i));
+			
 		}		
 		//setting up GridBagConstraints properties for submit-button in the form
 		updateLayoutHandler(0, labels.length, GridBagConstraints.HORIZONTAL, 0, 0);
@@ -115,7 +177,7 @@ public class AddRecordDialog extends JDialog{
 
 	}
 	//adds a comboBox for MODE field
-	private void addModeComboBox(String labelName, int rowNumber) {
+	private JComboBox<String> addModeComboBox(String labelName, int rowNumber) {
 		JLabel textLabel = new JLabel(labelName);
 		String[] modes = {"MTLY", "H/YRLY", "QRTLY", "YRLY"};
 		JComboBox<String> comboBox = new JComboBox<String>(modes);
@@ -126,34 +188,14 @@ public class AddRecordDialog extends JDialog{
 		
 		dialogLayoutHandler.gridx = 1;
 		this.add(comboBox, dialogLayoutHandler);
+		
+		return comboBox;
 	}
 	//helper function : adds a JLabel with "labelName" label and a JTextField on its right on specified rowNumber
-	private void addTextField(String labelName, int rowNumber) {
+	private JTextField addTextField(String labelName, int rowNumber) {
 		JLabel textLabel = new JLabel(labelName);
 		JTextField textData = new JTextField();
 
-		if(labelName.equals( labels[NAME] )) {
-			textField_Name = textData;
-		}
-		else if(labelName.equals( labels[POLICY_NO] )) {
-			textField_PolicyNo = textData;
-		}
-		else if(labelName.equals( labels[PHONE_NO])) {
-			textField_PhoneNo = textData;
-		}
-		else if(labelName.equals( labels[SUM_ASSURED])) {
-			textField_SumAssured = textData;
-		}
-		else if(labelName.equals( labels[PLAN_AND_TERM])) {
-			textField_PlanAndTerm = textData;
-		}
-		else if(labelName.equals( labels[PRIMIUM])) {
-			textField_Primium = textData;
-		}
-		else if(labelName.equals( labels[NEXT_DUE] )) {
-			textField_NextDue = textData;
-		}
-		
 		updateLayoutHandler(0, rowNumber, GridBagConstraints.HORIZONTAL, 1, 1);
 		dialogLayoutHandler.insets.left = 15; //some custom changes
 		this.add(textLabel, dialogLayoutHandler);
@@ -165,10 +207,11 @@ public class AddRecordDialog extends JDialog{
 		dialogLayoutHandler.insets.right = 15; //custom changes
 		
 		this.add(textData, dialogLayoutHandler);
+		return textData;
 	}
 	
 	//helper function : adds a custom dateField
-	private void addDateField(String labelName, int rowNumber) {
+	private CustomDateField addDateField(String labelName, int rowNumber) {
 		JLabel textLabel = new JLabel(labelName);
 		updateLayoutHandler(0, rowNumber, GridBagConstraints.HORIZONTAL, 0, 0);
 		dialogLayoutHandler.insets.left= 15;
@@ -180,6 +223,8 @@ public class AddRecordDialog extends JDialog{
 		dialogLayoutHandler.gridx=1;
 		dialogLayoutHandler.insets.right= 15;
 		this.add(dateField, dialogLayoutHandler);
+		
+		return dateField;
 	}
 	
 }
@@ -187,7 +232,7 @@ public class AddRecordDialog extends JDialog{
 //helper class, sets up a basic date field 
 class CustomDateField  extends JComponent
 {
-	private CustomDate date;
+	CustomDate date;
 	private JComboBox<String> monthBox;
 	private JTextField dateField;
 	private JTextField yearField;
@@ -226,10 +271,29 @@ class DialogEventManager implements ActionListener{
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		
-	}
-	private boolean isFormValid() {
-		
-		return true;
-	}
+		FileManager fileManager = null;
+		try {
+			fileManager = new FileManager(dialog.activeFileName);
+		} catch (IOException e2) {
+			System.out.println("Unable to add record to file, operation failed");
+			System.exit(1);
+		}
+		//addNewRecord Button
+		if(e.getSource().equals(dialog.submitButton)) {
+			System.out.println("Submit Pressed");
+			if(dialog.isFormValid()){
+				System.out.println("Form Valid");
+				//construct Student object and store it in file
+				fileManager.addRecord(dialog.getNewUser());
+				try {
+					fileManager.updateFileContent();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					System.out.println("Failed to write latest content back to file, AddRecord operation crash");
+					System.exit(1);
+				}
+			}
+			else System.out.println("invalid form");
+		}
+	}	
 };

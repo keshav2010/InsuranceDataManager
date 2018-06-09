@@ -31,6 +31,11 @@ public class CustomDate{
 		this.month = new String(month);
 		this.year = new String(year);
 	}
+	public CustomDate(CustomDate date) {
+		this.day = new String(date.day);
+		this.month = new String(date.month);
+		this.year = new String(date.year);
+	}
 	public String getDateString() {
 		return new String(day + month + year);
 	}

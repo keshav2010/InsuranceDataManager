@@ -25,6 +25,7 @@ public class MainFrame extends JFrame{
 	//These constant String values are defined here for safety and easy debugging, 
 	//As these are passed in as parameter file constructing MenuItems as well as used by 
 	//Event Manager class to find out source of event
+	public final static String stringMenuNew = new String("New");
 	public final static String stringMenuOpen = new String("Open");
 	public final static String stringMenuSave = new String("Save");
 	public final static String stringMenuExit = new String("Exit");
@@ -57,6 +58,11 @@ public class MainFrame extends JFrame{
 		menu = new JMenu("File");
 		
 		//Adding items in First-Menu
+		menuItem = new JMenuItem(stringMenuNew);
+		menuItem.setToolTipText("Create new File");
+		menuItem.addActionListener(eventManager);
+		menu.add(menuItem);
+		
 		menuItem = new JMenuItem(stringMenuOpen);
 		menuItem.setToolTipText("Open and View File");
 		menuItem.addActionListener(eventManager); 
@@ -105,6 +111,10 @@ class FrameEventManager implements ActionListener {
 		if(item.getText().equals(MainFrame.stringMenuExit)) {
 			mainFrame.dispose();
 		}
+		else if(item.getText().equals(MainFrame.stringMenuNew)) {
+			System.out.println("Clicked New");
+			FileMakerDialog fm = new FileMakerDialog();
+		}
 		else if(item.getText().equals(MainFrame.stringMenuOpen)) {
 			System.out.println("Clicked Open");
 			mainFrame.fileSelectDialog = new FileChooser();
@@ -112,7 +122,7 @@ class FrameEventManager implements ActionListener {
 		}
 		
 		else if(item.getText().equals(MainFrame.stringMenuSave)) {
-			System.out.println("Clicked SAVEe");
+			System.out.println("Clicked SAVE");
 		}
 		
 		else if(item.getText().equals(MainFrame.stringMenuAddRecord)) {

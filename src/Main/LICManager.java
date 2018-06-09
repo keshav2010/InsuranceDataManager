@@ -7,5 +7,6 @@ public class LICManager {
 	public static void main(String[] args) {
 		window = new MainFrame("LIC");
 	}
-
+	
 }
+
