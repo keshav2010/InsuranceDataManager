@@ -289,7 +289,6 @@ class DialogEventManager implements ActionListener{
 					System.out.println("adding record");
 					FileManager.addRecord(addRecordDialog.getNewUser());
 					addRecordDialog.updateVisibleInfo();
-					
 				} catch (IOException e1) {
 					System.out.println("Failed to add Record to file , exption raised in DialogEventManager");
 					e1.printStackTrace();

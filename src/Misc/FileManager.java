@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.util.Map;
 import java.util.TreeMap;
 
+import DisplayForms.MainPanel;
 import UserDetail.User;
 //FileManager is responsible for handling read/write operation of a file
 public class FileManager 
@@ -22,6 +23,7 @@ public class FileManager
 	
 	private static File file;
 	
+	public static MainPanel mainPanel=null;
 	//data is stored in file as key-value pair, key is Policy Number and value is user-data
 	private static TreeMap<String, User> fileTreeMap=null; 
 	
@@ -30,6 +32,10 @@ public class FileManager
 	 * reads in entire file content, updates it in-memory 
 	 * and writes back entire content back to file.
 	*/
+	public static TreeMap<String, User> getFileTreeMap()
+	{
+		return fileTreeMap;
+	}
 	public static String getActiveFileName() {
 		return activeFileName;
 	}
@@ -61,19 +67,26 @@ public class FileManager
 			System.out.println("CLASSNOTFOUND");
 			e.printStackTrace();
 		}
+		if(mainPanel != null)
+			mainPanel.updateTableView();
 		
 	}
 	public static int getActiveFileRecordsCount() {
+
 		return fileRecordsCount;
 	}
 	public static User getRecord(String policyNumber) {
+		
 		return fileTreeMap.get(policyNumber);
 	}
 	public static boolean isRecordExist(User record) {
 		String policyNumber = new String(record.policyNumber);
 		if(fileTreeMap == null)
 			return false;
+		if(mainPanel != null)
+			mainPanel.updateTableView();
 		return fileTreeMap.containsKey(policyNumber);
+		
 	}
 	
 	public static void addRecord(User record) throws FileNotFoundException, IOException {

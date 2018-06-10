@@ -37,6 +37,7 @@ public class MainFrame extends JFrame{
 	private static final long serialVersionUID = 1L;
 	public MainFrame(String title) {
 		mainPanel = new MainPanel();
+		FileManager.mainPanel = mainPanel;
 		this.add(mainPanel);
 		eventManager = new FrameEventManager(this); //initialized with this as parameter, thus registering the instance to manager class
 		this.setTitle(title);

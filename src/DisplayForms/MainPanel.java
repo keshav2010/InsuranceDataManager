@@ -49,20 +49,27 @@ public class MainPanel extends JPanel {
 		layoutHandler.weighty = weightY;
 		layoutHandler.fill = fill;
 	}
+	public void updateTableView() {
+		sheetTable.updateUI();
+	}
 	
-}//end of class MainPanel
+}
+//end of class MainPanel
 
 class SheetTable extends JTable{
-	public TableModel tableModel = new TableModel(); 
+	public TableModel tableModel;
 	public SheetTable() {
+		tableModel = new TableModel(); 
 		this.setModel(tableModel);
 		this.setToolTipText("View Sheet Record");
 		this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.setVisible(true);
 	}
-}//end of class SheetTable
+}
+//end of class SheetTable
 
-class TableModel extends AbstractTableModel{
+class TableModel extends AbstractTableModel
+{
 	private static final long serialVersionUID = 1L;
 	private static final String[] columnNames = 
 		{
@@ -89,6 +96,44 @@ class TableModel extends AbstractTableModel{
 	}
 	@Override
 	public Object getValueAt(int row, int col) {
+		if(col==0)
+			return row+1;
+		else if(col == 1) {
+			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+			return FileManager.getFileTreeMap().get(key).name;
+		}
+		else if(col == 2) {
+			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+			return FileManager.getFileTreeMap().get(key).policyNumber;
+		}
+		else if(col == 3) {
+			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+			return FileManager.getFileTreeMap().get(key).dateOfBirth.getDateString();
+		}
+		else if(col == 4) {
+			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+			return FileManager.getFileTreeMap().get(key).doc.getDateString();
+		}
+		else if(col == 5) {
+			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+			return String.valueOf(FileManager.getFileTreeMap().get(key).sum);
+		}
+		else if(col == 6) {
+			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+			return FileManager.getFileTreeMap().get(key).planAndTerm;
+		}
+		else if(col == 7) {
+			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+			return FileManager.getFileTreeMap().get(key).mode;
+		}
+		else if(col == 8) {
+			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+			return FileManager.getFileTreeMap().get(key).primium;
+		}
+		else if(col == 9) {
+			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+			return FileManager.getFileTreeMap().get(key).nextDue;
+		}
 		return null;
 	}
 	@Override //set up column header names
