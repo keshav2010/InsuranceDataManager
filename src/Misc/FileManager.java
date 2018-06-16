@@ -111,9 +111,14 @@ public class FileManager
 	}
 	
 	public static void addRecord(User record) throws FileNotFoundException, IOException {
-		if(isRecordExist(record)) {
+		try{
+			if(isRecordExist(record)) {
 			System.out.println("record already exist");
 			return;
+			}
+		}catch(RuntimeException e) {
+			//enter here if current file is empty
+			System.out.println("addRecord > RuntimeException > file empty , adding 1st record");
 		}
 		ous = new ObjectOutputStream(new FileOutputStream(file));
 		fileTreeMap.put(record.policyNumber, record);
