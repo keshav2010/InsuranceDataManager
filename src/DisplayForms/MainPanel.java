@@ -3,8 +3,13 @@ package DisplayForms;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -24,8 +29,16 @@ public class MainPanel extends JPanel {
 	
 	public JLabel label_fileName;
 	
+	private JButton btn_exportToExcel;
+	private PanelEventManager panelEventManager;
+	
 	//setup panel's layout, adds scrollpane and associated table
 	public MainPanel() {
+		panelEventManager = new PanelEventManager();
+		
+		btn_exportToExcel = new JButton("Generate Excel");
+		btn_exportToExcel.setForeground(Color.green);
+		btn_exportToExcel.setBackground(Color.black);
 		
 		this.setLayout(new GridBagLayout());
 		sheetTable = new SheetTable();
@@ -38,6 +51,11 @@ public class MainPanel extends JPanel {
 		
 		updateLayoutHandler(0,1, GridBagConstraints.BOTH, 1, 1); //update layoutHandler
 		this.add(scrollPane, layoutHandler); //add scrollPane that includes Table in it
+		
+		updateLayoutHandler(1 ,2, GridBagConstraints.HORIZONTAL, 0, 0);
+		layoutHandler.insets = new Insets(5,5,5,5);
+		this.add(btn_exportToExcel, layoutHandler);
+		btn_exportToExcel.addActionListener(panelEventManager);
 		this.setVisible(true);
 	}
 	
@@ -47,6 +65,9 @@ public class MainPanel extends JPanel {
 		layoutHandler.gridy = gridY;
 		layoutHandler.weightx = weightX;
 		layoutHandler.weighty = weightY;
+		layoutHandler.gridheight=1;
+		layoutHandler.gridwidth=1;
+		layoutHandler.insets.bottom = layoutHandler.insets.top = layoutHandler.insets.left = layoutHandler.insets.right = 0;
 		layoutHandler.fill = fill;
 	}
 	public void updateTableView() {
@@ -55,6 +76,15 @@ public class MainPanel extends JPanel {
 	
 }
 //end of class MainPanel
+class PanelEventManager implements ActionListener{
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+}
 
 class SheetTable extends JTable{
 	public TableModel tableModel;
@@ -90,49 +120,57 @@ class TableModel extends AbstractTableModel
 	}
 	@Override
 	public int getRowCount() {
-		if(FileManager.getActiveFileName() == null)
-			return 0;
-		return FileManager.getActiveFileRecordsCount();
+		if(FileManager.getActiveFileName() != null) {		
+			return FileManager.getActiveFileRecordsCount();
+		}
+		return 0;
 	}
 	@Override
 	public Object getValueAt(int row, int col) {
-		if(col==0)
-			return row+1;
-		else if(col == 1) {
-			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
-			return FileManager.getFileTreeMap().get(key).name;
+		try 
+		{	
+			if(col==0)
+				return row+1;
+			else if(col == 1) {
+				String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+				return FileManager.getFileTreeMap().get(key).name;
+			
+			}
+			else if(col == 2) {
+				String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+				return FileManager.getFileTreeMap().get(key).policyNumber;
+			}
+			else if(col == 3) {
+				String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+				return FileManager.getFileTreeMap().get(key).dateOfBirth.getDateString();
+			}
+			else if(col == 4) {
+				String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+				return FileManager.getFileTreeMap().get(key).doc.getDateString();
+			}
+			else if(col == 5) {
+				String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+				return String.valueOf(FileManager.getFileTreeMap().get(key).sum);
+			}
+			else if(col == 6) {
+				String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+				return FileManager.getFileTreeMap().get(key).planAndTerm;
+			}
+			else if(col == 7) {
+				String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+				return FileManager.getFileTreeMap().get(key).mode;
+			}
+			else if(col == 8) {
+				String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+				return FileManager.getFileTreeMap().get(key).primium;
+			}
+			else if(col == 9) {
+				String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
+				return FileManager.getFileTreeMap().get(key).nextDue;
+			}
 		}
-		else if(col == 2) {
-			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
-			return FileManager.getFileTreeMap().get(key).policyNumber;
-		}
-		else if(col == 3) {
-			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
-			return FileManager.getFileTreeMap().get(key).dateOfBirth.getDateString();
-		}
-		else if(col == 4) {
-			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
-			return FileManager.getFileTreeMap().get(key).doc.getDateString();
-		}
-		else if(col == 5) {
-			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
-			return String.valueOf(FileManager.getFileTreeMap().get(key).sum);
-		}
-		else if(col == 6) {
-			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
-			return FileManager.getFileTreeMap().get(key).planAndTerm;
-		}
-		else if(col == 7) {
-			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
-			return FileManager.getFileTreeMap().get(key).mode;
-		}
-		else if(col == 8) {
-			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
-			return FileManager.getFileTreeMap().get(key).primium;
-		}
-		else if(col == 9) {
-			String key = (String) FileManager.getFileTreeMap().keySet().toArray()[row];
-			return FileManager.getFileTreeMap().get(key).nextDue;
+		catch(RuntimeException e) {
+			return null;
 		}
 		return null;
 	}

@@ -32,19 +32,26 @@ public class FileManager
 	 * reads in entire file content, updates it in-memory 
 	 * and writes back entire content back to file.
 	*/
-	public static TreeMap<String, User> getFileTreeMap()
+	public static TreeMap<String, User> getFileTreeMap() throws RuntimeException
 	{
+		if(getActiveFileRecordsCount() == 0)
+			throw new RuntimeException("Empty File, Exception Thrown : getFileTreeMap");
 		return fileTreeMap;
 	}
 	public static String getActiveFileName() {
 		return activeFileName;
 	}
-	public static void setActiveFileName(String filename) {
+	public static void setActiveFileName(String filename) throws FileNotFoundException {
+		if(filename.trim().length()==0)
+			throw new FileNotFoundException("Invalid file name");
+		
 		activeFileName = new String(filename);
+		
 		file = new File(activeFileName);
 		if(!file.exists()) {
 			try {
 				file.createNewFile();
+				System.out.println("Created new file : "+filename);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				System.out.println("FileManager > setActiveFileName > error creating file");
@@ -52,15 +59,26 @@ public class FileManager
 			}
 		}
 		else System.out.println("File already found");
+		
+		//read content of file and put in memory
 		try {
+			System.out.println("Reading content and updating treemap");
 			ois = new ObjectInputStream(new FileInputStream(file));
+			System.out.println("opened stream");
+			if(fileTreeMap != null) {
+				fileTreeMap.clear();
+				fileTreeMap = null;
+				fileRecordsCount=0;
+			}
 			fileTreeMap = new TreeMap<String, User> ( (TreeMap<String, User>) ois.readObject());
 			ois.close();
+			System.out.println("closed stream, updated TreeMap");
 			fileRecordsCount = fileTreeMap.size();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Empty File");
+			//might enter here if file is empty
+			System.out.println("Empty File > IOException > setActiveFileName > reading content of file");
 			fileTreeMap = new TreeMap<String, User>();
+			fileRecordsCount=0;
 			
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -72,14 +90,17 @@ public class FileManager
 		
 	}
 	public static int getActiveFileRecordsCount() {
-
 		return fileRecordsCount;
 	}
-	public static User getRecord(String policyNumber) {
-		
+	public static User getRecord(String policyNumber) throws RuntimeException{
+		if(getActiveFileRecordsCount() == 0)
+			throw new RuntimeException("Empty File, Exception Thrown : getRecord()");
 		return fileTreeMap.get(policyNumber);
 	}
-	public static boolean isRecordExist(User record) {
+	public static boolean isRecordExist(User record) throws RuntimeException {
+		if(getActiveFileRecordsCount() == 0)
+			throw new RuntimeException("Empty File, Exception Thrown : isRecordExist()");
+		
 		String policyNumber = new String(record.policyNumber);
 		if(fileTreeMap == null)
 			return false;
@@ -100,7 +121,10 @@ public class FileManager
 		ous.close();
 		fileRecordsCount++;
 	}
-	public static void deleteRecord(User record) throws FileNotFoundException, IOException {
+	public static void deleteRecord(User record) throws FileNotFoundException, IOException, RuntimeException {
+		if(getActiveFileRecordsCount() == 0)
+			throw new RuntimeException("Empty File, Exception Thrown : deleteRecord");
+		
 		if(!isRecordExist(record))
 			return;
 		fileTreeMap.remove(record.policyNumber);

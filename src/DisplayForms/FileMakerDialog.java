@@ -7,6 +7,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -91,22 +92,14 @@ class EventManager implements ActionListener
 		if(e.getSource().equals(fileMakerDialog.btn_createFile))
 		{
 			String text=fileMakerDialog.textFields.get(FileMakerDialog.labels[0]).getText().trim();
-			if(text.length()==0)
-				return;
-			File f = new File(text);
-			
-			if(!f.exists()) {
-				try {
-					f.createNewFile();
-					System.out.println("Created file "+f.getAbsolutePath());
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+			try {
+				FileManager.setActiveFileName(new String(text));
+				fileMakerDialog.mainFrame.mainPanel.label_fileName.setForeground(Color.black);
+				fileMakerDialog.mainFrame.mainPanel.label_fileName.setText("Current Active File : "+FileManager.getActiveFileName());
+			} catch (FileNotFoundException e1) {
+				//enter here if file name is invalid
+				System.out.println(e1.getMessage());
 			}
-			FileManager.setActiveFileName(new String(text));
-			fileMakerDialog.mainFrame.mainPanel.label_fileName.setForeground(Color.black);
-			fileMakerDialog.mainFrame.mainPanel.label_fileName.setText("Current Active File : "+FileManager.getActiveFileName());
 		}
 		fileMakerDialog.dispose();
 	}

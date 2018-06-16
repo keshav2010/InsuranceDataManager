@@ -1,5 +1,6 @@
 package DisplayForms;
 
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -46,6 +47,7 @@ public class MainFrame extends JFrame{
 		this.setSize(Toolkit.getDefaultToolkit().getScreenSize().width,
 				Toolkit.getDefaultToolkit().getScreenSize().height);
 		this.setJMenuBar(createMenuBar());
+		this.setMinimumSize(new Dimension(800,600));
 		this.setVisible(true);
 	}
 	//Setup the MenuBar
