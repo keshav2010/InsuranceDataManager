@@ -1,5 +1,7 @@
 package Main;
+import DisplayForms.GenerateExcelDialog;
 import DisplayForms.MainFrame;
+import DisplayForms.WarningDialog;
 public class LICManager {
 
 	private static MainFrame window;

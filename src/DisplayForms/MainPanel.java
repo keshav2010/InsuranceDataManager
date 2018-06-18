@@ -21,6 +21,7 @@ import javax.swing.table.AbstractTableModel;
 import Misc.FileManager;
 //sets up the panel that includes a SrollPane along with a JTable object, 
 //MainPanel will also include several additional components such as checkboxes etc
+@SuppressWarnings("serial")
 public class MainPanel extends JPanel {
 
 	public GridBagConstraints layoutHandler = new GridBagConstraints();
@@ -70,22 +71,25 @@ public class MainPanel extends JPanel {
 		layoutHandler.insets.bottom = layoutHandler.insets.top = layoutHandler.insets.left = layoutHandler.insets.right = 0;
 		layoutHandler.fill = fill;
 	}
+	
 	public void updateTableView() {
 		sheetTable.updateUI();
 	}
 	
-}
-//end of class MainPanel
-class PanelEventManager implements ActionListener{
+	class PanelEventManager implements ActionListener{
 
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(e.getSource().equals(btn_exportToExcel)) {
+				new GenerateExcelDialog();
+			}
+		}
 		
 	}
-	
 }
 
+
+@SuppressWarnings("serial")
 class SheetTable extends JTable{
 	public TableModel tableModel;
 	public SheetTable() {

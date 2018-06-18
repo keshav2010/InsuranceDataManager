@@ -13,7 +13,12 @@ import java.util.TreeMap;
 import DisplayForms.MainPanel;
 import UserDetail.User;
 //FileManager is responsible for handling read/write operation of a file
-public class FileManager 
+/**
+ * Utility class that is an all-static methods and state class and <b>must not be instantiated.</b><br>
+ * Responsible for reading/writing user-entered data from/to binary file.<br>
+ * @author KESHAV SHARMA
+ */
+public final class FileManager 
 {
 	private static String activeFileName=null;
 	private static int fileRecordsCount=0;
@@ -38,6 +43,7 @@ public class FileManager
 			throw new RuntimeException("Empty File, Exception Thrown : getFileTreeMap");
 		return fileTreeMap;
 	}
+	
 	public static String getActiveFileName() {
 		return activeFileName;
 	}
