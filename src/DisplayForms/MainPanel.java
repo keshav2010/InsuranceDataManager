@@ -77,14 +77,12 @@ public class MainPanel extends JPanel {
 	}
 	
 	class PanelEventManager implements ActionListener{
-
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if(e.getSource().equals(btn_exportToExcel)) {
 				new GenerateExcelDialog();
 			}
 		}
-		
 	}
 }
 
