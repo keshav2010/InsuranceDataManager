@@ -5,13 +5,19 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import Misc.WorkbookManager;
 
 //Dialog presents user with option to write existing file data to an excel file
 public class GenerateExcelDialog extends JDialog{
@@ -61,7 +67,7 @@ public class GenerateExcelDialog extends JDialog{
 	}
 	
 	//nested class, responsible for managing events for this specific dialog only
-	class EventManager implements ActionListener 
+	class EventManager implements ActionListener
 	{
 		@Override
 		public void actionPerformed(ActionEvent e) 
@@ -83,9 +89,14 @@ public class GenerateExcelDialog extends JDialog{
 				 * generating workbooks, sheet should take over responsibility of generating excel workbook
 				 * by reading the current active file's data structure, writing values to particular sheet
 				 */
+				try {
+					WorkbookManager.generateWorkbook(fileName);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		}
-		
 	}
 	
 }
