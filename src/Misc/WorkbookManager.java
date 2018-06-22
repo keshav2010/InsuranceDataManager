@@ -49,7 +49,7 @@ public final class WorkbookManager {
 		try {	
 			FileOutputStream fout = new FileOutputStream(file);
 			XSSFWorkbook workbook = new XSSFWorkbook();
-			XSSFSheet sheet = workbook.createSheet();
+			XSSFSheet sheet = workbook.createSheet("Sheet "+ String.valueOf(workbook.getNumberOfSheets()+1) );
 			
 			/*
 			 * Write data to excel sheet, where the first row (indexed 0) is used to generate
@@ -92,7 +92,7 @@ public final class WorkbookManager {
 		for(String policyString : policyNumberSet)
 		{	
 			User currentRecord = dataTree.get(policyString);
-			sheet.createRow(row++);
+			sheet.createRow(row);
 			//loop entire row
 			for(int i=0; i<sheetColumnHeader.length; i++)
 			{
@@ -112,6 +112,7 @@ public final class WorkbookManager {
 				case "NEXT DUE": cell.setCellValue(currentRecord.nextDue);break;
 				}
 			}
+			row++;
 		}
 	}
 }

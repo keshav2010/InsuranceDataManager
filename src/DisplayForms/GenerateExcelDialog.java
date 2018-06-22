@@ -33,8 +33,10 @@ public class GenerateExcelDialog extends JDialog{
 		//init
 		eventManager = new EventManager();
 		btn_generateFile = new JButton("Convert");
+		
 		fld_workbookName = new JTextField();
-		lbl_workbookName = new JLabel("Enter Workbook Name : ");
+		lbl_workbookName = new JLabel("Workbook Name : ");
+		
 		layout = new GridBagLayout();
 		layoutHandler = new GridBagConstraints();
 		btn_generateFile.addActionListener(eventManager);
@@ -52,7 +54,7 @@ public class GenerateExcelDialog extends JDialog{
 		updateLayoutHandler(1, 0, GridBagConstraints.HORIZONTAL, 1, 0);
 		this.add(fld_workbookName, layoutHandler);
 		
-		updateLayoutHandler(0, 1, GridBagConstraints.HORIZONTAL, 0, 0);
+		updateLayoutHandler(0, 2, GridBagConstraints.HORIZONTAL, 0, 0);
 		this.add(btn_generateFile, layoutHandler);
 	}
 	private void updateLayoutHandler(int gridX, int gridY, int fill, double weightX, double weightY) {
